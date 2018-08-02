@@ -10,6 +10,10 @@ const { Meta } = Card;
 const Panel = Collapse.Panel;
 
 
+const electron = window.require('electron');
+const fs = electron.remote.require('fs');
+const child_process = electron.remote.require( 'child_process' )
+
 class Projects extends Component {
 
     constructor(){
@@ -59,6 +63,23 @@ class Projects extends Component {
 
     edit(item, key){
         this.props.history.push(`/editor/${item.folder}`)
+    }
+
+    serveProject(item){
+
+        const shell = new Shell('npm start', item.path.replace('//', '/').replace('/', '\\'))
+        shell.run({
+            onMessage : (data) => {
+                console.log(data.toString())
+                child_process.execSync('start http://localhost:9000')
+            },
+            onError : (data) => {
+                console.log(data.toString())
+            },
+            close : (data) => {
+                console.log(data.toString())
+            }
+        })
     }
 
     // npm install
@@ -208,7 +229,7 @@ class Projects extends Component {
             <Modal 
                 className="loggerModal"
                 title="Terminal"
-                width="50%"
+                width="80%"
                 visible={this.state.modalVisible }
                 onOk={this.handleOk}
                 onCancel={this.handleCancel}
@@ -223,9 +244,12 @@ class Projects extends Component {
         )
     }
 
-
+    openLink (link) {
+        child_process.execSync(`start ${link}`)
+    }
 
     resultListRender = (item) => {
+        console.log(item)
         let isInstalled = this.checkPackageInstalled(item.package)
         let actions = [
             <span> {item.package.version} </span>
@@ -244,7 +268,7 @@ class Projects extends Component {
                 actions={actions}
             >
                 <List.Item.Meta
-                    title={item.package.name}
+                    title={ <span onClick={() => { this.openLink(item.package.links.homepage) }}> {item.package.name} </span>}
                     description={item.package.description}
                 />
             </List.Item>
@@ -301,7 +325,7 @@ class Projects extends Component {
                     
                             <List.Item.Meta
                             // avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                            title={<a href="https://ant.design">{item.name}</a>}
+                            title={item.name}
                             description={item.version}
                             />
                         </List.Item>
@@ -393,7 +417,8 @@ class Projects extends Component {
                         }}/>, 
                         <Icon type="edit" onClick={(event) => { this.edit(item, i) }}/>, 
                         <Icon type="delete" onClick={(event) => { this.delete(item, i) }}/>, 
-                        <Icon type="rocket" onClick={(event) => { this.runNpmInstall(item) }}/>
+                        <Icon type="rocket" onClick={(event) => { this.runNpmInstall(item) }}/>,
+                        <Icon type="laptop" onClick={(event) => { this.serveProject(item) }}/>
                     ]}
                 >
                     <Meta

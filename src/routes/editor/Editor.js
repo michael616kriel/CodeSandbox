@@ -82,6 +82,9 @@ class Editor extends Component {
             },
             'json' : {
                 mode : 'javascript'
+            },
+            'js' : {
+                mode : 'javascript'
             }
         }
 
@@ -109,7 +112,7 @@ class Editor extends Component {
                             values[key] = value
                         }
                     }
-                    console.log(values[key])
+
                     this.setState({values : values, panes : panes})
                 }}
             />

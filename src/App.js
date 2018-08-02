@@ -7,6 +7,7 @@ import { Layout, Menu, Icon, Breadcrumb } from 'antd';
 import Projects from './routes/projects/Projects';
 import Editor from './routes/editor/Editor';
 
+
 const { Header, Sider, Content } = Layout;
 const electron = window.require('electron');
 const fs = electron.remote.require('fs');
@@ -47,6 +48,7 @@ class App extends Component {
                 <span>Projects</span>
               </Link>
             </Menu.Item>
+
           </Menu>
         </Sider>
 
@@ -67,6 +69,7 @@ class App extends Component {
               <Switch>
                 <Route exact path='/' component={Projects}/>
                 <Route exact path='/editor/:folder' component={Editor}/>
+
               </Switch>
           </Content>
         </Layout>
