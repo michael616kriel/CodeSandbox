@@ -1,0 +1,37 @@
+{
+  "name": "codesandbox",
+  "version": "0.1.0",
+  "private": true,
+  "main": "main.js",
+  "homepage": "./",
+  "dependencies": {
+    "antd": "^3.7.3",
+    "axios": "^0.18.0",
+    "babel-plugin-import": "^1.8.0",
+    "codemirror": "^5.39.2",
+    "electron-context-menu": "^0.10.0",
+    "react": "^16.4.1",
+    "react-app-rewired": "^1.5.2",
+    "react-codemirror2": "^5.1.0",
+    "react-dom": "^16.4.1",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "1.1.4"
+  },
+  "scripts": {
+    "start": "nf start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test --env=jsdom",
+    "eject": "react-scripts eject",
+    "electron": "electron .",
+    "electron-start": "node src/electron-wait-react",
+    "react-start": "react-app-rewired start"
+  },
+  "devDependencies": {
+    "css-loader": "^1.0.0",
+    "electron": "^2.0.6",
+    "foreman": "^3.0.1",
+    "less": "^3.8.0",
+    "less-loader": "^4.1.0",
+    "style-loader": "^0.21.0"
+  }
+}

@@ -1,0 +1,58 @@
+@import '~codemirror/lib/codemirror.css';
+@import '~codemirror/theme/material.css';
+
+
+.react-codemirror2, .react-codemirror2 .CodeMirror {
+    height: 100%;
+    display: block;
+    margin: 0;
+    width: 100%;
+}
+
+.customEditor{
+    font-size: 13px;
+}
+
+.editor-tabs .ant-tabs-bar {
+    margin: 0;
+}
+
+.editor-tabs .ant-tabs-bar {
+    margin: 0;
+    /* position: fixed; */
+    z-index: 99;
+    width: 100%;
+}
+
+.editor-tabs, .editor-tabs .ant-tabs-content, .editor-tabs .ant-tabs-tabpane {
+    height: calc(100% - 10px);
+}
+
+.editor-tabs.ant-tabs-card > .ant-tabs-bar .ant-tabs-tab {
+    background: #d3d3d3;
+    border-radius: 0;
+}
+
+.editor-tabs.ant-tabs-card > .ant-tabs-bar .ant-tabs-tab-active {
+    background: #263238 !important;
+}
+
+.editor-tabs .ant-tabs-content{
+    background: #263238 !important;
+}
+
+.editor-tabs.ant-tabs-card > .ant-tabs-bar .ant-tabs-tab-active .anticon-close {
+    color: #fff;
+}
+
+.editor-tabs .ant-tabs-nav {
+    margin-left: 6px !important;
+}
+
+.editor-tabs .ant-tabs-nav-container{
+    margin-top: 4px;
+}
+
+.editor-tabs .ant-tabs-bar {
+    border: none;
+}

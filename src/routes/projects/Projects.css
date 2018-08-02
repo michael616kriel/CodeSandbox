@@ -1,0 +1,6 @@
+.loggerModal .ant-modal-body {
+    background: #000;
+    color: #fff;
+    font-size: 12px;
+    white-space: pre-line;
+}

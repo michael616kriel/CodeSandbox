@@ -1,0 +1,51 @@
+@import '~antd/dist/antd.css';
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent; 
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+
+.ant-layout.ant-layout-has-sider {
+  height: 100%;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  display: block;
+  box-sizing: border-box;
+}
+
+#root .trigger {
+  font-size: 18px;
+  line-height: 64px;
+  padding: 0 24px;
+  cursor: pointer;
+  transition: color .3s;
+}
+
+#root .trigger:hover {
+  color: #1890ff;
+}
+
+#root .logo {
+  height: 32px;
+  background: rgba(255,255,255,.2);
+  margin: 16px;
+}
