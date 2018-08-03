@@ -2,28 +2,19 @@ import React, { Component } from 'react';
 import { Switch, Route, Link } from 'react-router-dom'
 import './App.css';
 
-import { Layout, Menu, Icon, Breadcrumb } from 'antd';
+import { Layout, Menu, Icon } from 'antd';
 
 import Projects from './routes/projects/Projects';
 import Editor from './routes/editor/Editor';
 
 
 const { Header, Sider, Content } = Layout;
-const electron = window.require('electron');
-const fs = electron.remote.require('fs');
-const ipcRenderer  = electron.ipcRenderer;
-
 
 class App extends Component {
 
   state = {
     collapsed: false,
   };
-
-  constructor(){
-    super()
- 
-  }
 
   toggle = () => {
     this.setState({

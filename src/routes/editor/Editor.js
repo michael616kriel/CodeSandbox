@@ -1,11 +1,11 @@
 
 
 import React, { Component } from 'react';
-import { Card, Icon, Avatar, Col, Row, Drawer, List, Collapse, Modal, Button, Layout, Tree  } from 'antd';
+import { Icon, Button, Layout, Tree  } from 'antd';
 import { UnControlled as CodeMirror} from 'react-codemirror2'
 import { Tabs } from 'antd';
 
-import Shell from '../../lib/Shell'
+
 import FileManager from '../../lib/FileManager'
 import './Editor.css';
 
@@ -16,10 +16,10 @@ require('codemirror/mode/css/css');
 const TabPane = Tabs.TabPane;
 const DirectoryTree = Tree.DirectoryTree;
 const TreeNode = Tree.TreeNode;
-const { Header, Content, Footer, Sider } = Layout;
+const { Content, Sider } = Layout;
 const electron = window.require('electron');
 
-const {globalShortcut} = electron.remote
+
 
 class Editor extends Component {
 
@@ -261,7 +261,7 @@ class Editor extends Component {
                  <Layout style={{ padding: '0', background: '#fff' }}>
                     <Sider width={250} style={{ background: '#fff' }}>
 
-                    <Button onClick={() => { this.saveFile() }}>Save File</Button>
+                    <Button style={{ margin : 10 }} onClick={() => { this.saveFile() }}>Save File</Button>
 
                     <DirectoryTree
                         defaultExpandAll

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Icon, Avatar, Col, Row, Drawer, List, Collapse, Modal, Button, Tabs, Input, Divider } from 'antd';
+import { Card, Icon, Col, Row, Drawer, List, Collapse, Modal, Button, Input, Divider, message } from 'antd';
 import './Projects.css';
 import Shell from '../../lib/Shell'
 import NpmRegistry from '../../lib/NpmRegistry'
@@ -11,7 +11,6 @@ const Panel = Collapse.Panel;
 
 
 const electron = window.require('electron');
-const fs = electron.remote.require('fs');
 const child_process = electron.remote.require( 'child_process' )
 
 class Projects extends Component {
@@ -59,6 +58,7 @@ class Projects extends Component {
         this.setState({
             projects: this.state.projects.filter((_, i) => i !== key),
         })
+        message.success(`${item.folder} deleted.`);
     }
 
     edit(item, key){
@@ -320,8 +320,8 @@ class Projects extends Component {
                         itemLayout="horizontal"
                         dataSource={this.mapDependencies(dependencies)}
                         renderItem={item => (
-                        <List.Item>
-
+                        <List.Item actions={[<Button type="danger">Unistall</Button>]}>
+                            
                     
                             <List.Item.Meta
                             // avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
@@ -338,7 +338,7 @@ class Projects extends Component {
                         itemLayout="horizontal"
                         dataSource={this.mapDependencies(devDependencies)}
                         renderItem={item => (
-                        <List.Item>
+                        <List.Item actions={[<Button type="danger">Unistall</Button>]}>
 
                     
                             <List.Item.Meta
@@ -356,7 +356,7 @@ class Projects extends Component {
                         itemLayout="horizontal"
                         dataSource={this.mapDependencies(scripts)}
                         renderItem={item => (
-                        <List.Item>
+                        <List.Item actions={[<Button type="dashed">Run</Button>]}>
 
                     
                             <List.Item.Meta
@@ -403,7 +403,7 @@ class Projects extends Component {
     }
 
     render() {
-
+ 
         const allProjects = this.state.projects.map((item, i) => (
             <Col span={6} key={i}>
                 <Card
@@ -423,7 +423,10 @@ class Projects extends Component {
                 >
                     <Meta
                     // avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                    title={item.folder}
+                    title={[
+                        <Icon key={1} type="folder" style={{ fontSize : 32, margin : '0 10px 0 0'}}/>, 
+                        <span key={2} style={{ fontSize : 20, top : -5, position: 'relative' }}>{item.folder}</span>
+                    ]}
                     description={item.package.version}
                     />
                 </Card>
