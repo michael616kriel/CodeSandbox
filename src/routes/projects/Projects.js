@@ -5,6 +5,7 @@ import Shell from '../../lib/Shell'
 import NpmRegistry from '../../lib/NpmRegistry'
 import FileManager from '../../lib/FileManager'
 
+const theme = require('./../../theme')
 const Search = Input.Search;
 const { Meta } = Card;
 const Panel = Collapse.Panel;
@@ -424,8 +425,8 @@ class Projects extends Component {
                     <Meta
                     // avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
                     title={[
-                        <Icon key={1} type="folder" style={{ fontSize : 32, margin : '0 10px 0 0'}}/>, 
-                        <span key={2} style={{ fontSize : 20, top : -5, position: 'relative' }}>{item.folder}</span>
+                        <Icon key={1} type="folder" style={{ fontSize : 32, margin : '0 10px 0 0', color : theme['secondary-color']}}/>, 
+                        <span key={2} style={{ fontSize : 20, top : -5, position: 'relative', color : theme['primary-color'] }}>{item.folder}</span>
                     ]}
                     description={item.package.version}
                     />

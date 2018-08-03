@@ -5,6 +5,8 @@ import { Icon, Button, Layout, Tree  } from 'antd';
 import { UnControlled as CodeMirror} from 'react-codemirror2'
 import { Tabs } from 'antd';
 
+import ContextMenu from '../../components/ContextMenu'
+
 
 import FileManager from '../../lib/FileManager'
 import './Editor.css';
@@ -141,6 +143,7 @@ class Editor extends Component {
         })
     }
 
+
     renderTreeNodes = (data) => {
         if(!data){
             return
@@ -153,11 +156,40 @@ class Editor extends Component {
                 </TreeNode>
             );
             }
-            return <TreeNode title={item.name} key={item.key} dataRef={item} isLeaf/>;
+            return (
+                <TreeNode title={item.name} key={item.key} dataRef={item} isLeaf/>
+            );
         });
     }
 
+    findFileByKey(key, folder){
+        let result = null
+        for(var f in folder){
+            var item = folder[f]
+            if(item.children > 0){
+                result = this.findFileByKey(key, item.children) 
+            }else if(item.key === key){
+                result = item
+            }
+        }
+        return result
+    }
+
+    onRightClick = (event) => {
+        let file = null
+        if(event.node.props.dataRef){ //is file
+            let fileKey = event.node.props.dataRef.key
+            file = this.findFileByKey(fileKey, this.state.folder.children)
+            this.refs.ContextMenu1.show();
+        }else{
+            file = 'folder'
+            this.refs.ContextMenu2.show();
+        }
+        console.log(file)
+    }
+
     onSelect(item, e) {
+        console.log(e)
         if(!e.selectedNodes[0]){
             return
         }
@@ -255,25 +287,41 @@ class Editor extends Component {
     
    
     render() {
-    
+
+        const fileMenu = ([
+            <div className="contextMenu--option" key={3}>Rename</div>,
+            <div className="contextMenu--option" key={4}>Delete</div>,
+        ])
+        const folderMenu = ([
+            <div className="contextMenu--option" key={0}>New File</div>,
+            <div className="contextMenu--option" key={1}>New Folder</div>,
+            <div className="contextMenu--separator" key={2}/>,
+            <div className="contextMenu--option" key={3}>Rename</div>,
+            <div className="contextMenu--option" key={4}>Delete</div>,
+        ])
+
         return (
             <div className="Editor">
+
+                <ContextMenu ref="ContextMenu1" id="ContextMenu1" children={ fileMenu }/>
+                <ContextMenu ref="ContextMenu2" id="ContextMenu2" children={ folderMenu }/>
 
                  <Layout style={{ padding: '0', background: '#fff' }}>
                     <Sider width={250} style={{ background: '#fff' }}>
 
                     <Button style={{ margin : 10 }} onClick={() => { this.saveFile() }}>Save File</Button>
-
+                    
                     <DirectoryTree
                         defaultExpandAll
                         onSelect={(item, e) => {
                             this.onSelect(item, e)
                         }}
+                        onRightClick={(e) => {this.onRightClick(e)}}
                     >
-
-                    <TreeNode title={this.state.folder.name} key="0-0">
-                        { this.renderTreeNodes(this.state.folder.children) }
-                    </TreeNode>
+                
+                        <TreeNode title={this.state.folder.name} key="0-0">
+                            { this.renderTreeNodes(this.state.folder.children) }
+                        </TreeNode> 
 
                     </DirectoryTree>
                     </Sider>

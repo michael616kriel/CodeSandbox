@@ -7,6 +7,8 @@ module.exports = {
         
         const { injectBabelPlugin } = require('react-app-rewired');
         const rewireLess = require('react-app-rewire-less');
+        const rewireSass = require('react-app-rewire-scss');
+        
         const theme = require('./src/theme')
 
         config = injectBabelPlugin([
@@ -16,11 +18,13 @@ module.exports = {
                 style: true    
             }
         ], config);
-
+        
         config = rewireLess.withLoaderOptions({ 
             javascriptEnabled: true ,
             modifyVars: theme
         })(config, env);
+
+        config = rewireSass(config, env);
         
         return config;
     }

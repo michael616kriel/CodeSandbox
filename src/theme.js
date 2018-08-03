@@ -1,4 +1,10 @@
 
+/*
+**
+**  Overides Ant Design Theme less vars
+**
+*/
+
 
 var pallet = {
     primary : '#33536a',
@@ -12,11 +18,12 @@ module.exports = {
 
     // -------- Colors -----------
     'primary-color'         : pallet.primary,
+    'secondary-color'         : pallet.secondary, //this is not a ant Less var
     'info-color'             : pallet.primary,
     'success-color'         : pallet.green,
     'processing-color'    : pallet.primary,
     'error-color'          : pallet.red,
-    'highlight-color'       : pallet.primary,
+    'highlight-color'       : pallet.secondary,
     'warning-color'         : pallet.yellow,
     'normal-color'          : pallet.primary,
 

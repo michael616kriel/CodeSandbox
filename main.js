@@ -12,18 +12,18 @@ const url = require('url');
 let mainWindow;
 
 //add context menu
-require('electron-context-menu')({
-    prepend: (params, browserWindow) => [{
-        label: 'Context Menu',
-        // Only show it when right-clicking images
-        visible: params.mediaType === 'image'
-    }]
-});
+// require('electron-context-menu')({
+//     prepend: (params, browserWindow) => [{
+//         label: 'Context Menu',
+//         // Only show it when right-clicking images
+//         visible: params.mediaType === 'image'
+//     }]
+// });
 
 
 function createWindow() {
     // Create the browser window.
-    mainWindow = new BrowserWindow({width: 800, height: 600});
+    mainWindow = new BrowserWindow({width: 800, height: 600, frame: true, titleBarStyle: 'hiddenInset'});
 
     const startUrl = process.env.ELECTRON_START_URL || url.format({
         pathname: path.join(__dirname, '/../build/index.html'),
