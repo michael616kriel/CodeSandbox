@@ -56,3 +56,7 @@
 .editor-tabs .ant-tabs-bar {
     border: none;
 }
+
+.editor-tabs .ant-tabs.ant-tabs-card > .ant-tabs-bar .ant-tabs-tab-active {
+    color: #fff;
+}

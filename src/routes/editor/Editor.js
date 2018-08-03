@@ -13,6 +13,7 @@ require('codemirror/mode/xml/xml');
 require('codemirror/mode/javascript/javascript');
 require('codemirror/mode/css/css');
 
+const theme = require('./../../theme')
 const TabPane = Tabs.TabPane;
 const DirectoryTree = Tree.DirectoryTree;
 const TreeNode = Tree.TreeNode;
@@ -175,7 +176,7 @@ class Editor extends Component {
 
     tabPaneRender = (pane) => {
         const titleBar = [
-            <Icon key={pane.key} type={(pane.saved) ? "star" : "star-o" } style={ {color : (pane.saved) ? "green" : "red"} } />,
+            <Icon key={pane.key} type={(pane.saved) ? "star" : "star-o" } style={ {color : (pane.saved) ? theme['success-color'] : theme['error-color']} } />,
             pane.title
         ]
         return <TabPane tab={titleBar} key={pane.key} closable={pane.closable}>{pane.content}</TabPane>
