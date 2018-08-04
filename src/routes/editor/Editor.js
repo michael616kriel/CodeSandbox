@@ -15,13 +15,14 @@ require('codemirror/mode/xml/xml');
 require('codemirror/mode/javascript/javascript');
 require('codemirror/mode/css/css');
 
+
 const theme = require('./../../theme')
 const TabPane = Tabs.TabPane;
 const DirectoryTree = Tree.DirectoryTree;
 const TreeNode = Tree.TreeNode;
 const { Content, Sider } = Layout;
 const electron = window.require('electron');
-
+const prompt = electron.remote.require('electron-prompt');
 
 
 class Editor extends Component {
@@ -33,7 +34,8 @@ class Editor extends Component {
             folder : {},
             values : {},
             activeKey: null,
-            panes : []
+            panes : [],
+            contextSelection : null
         }
     }   
 
@@ -162,34 +164,122 @@ class Editor extends Component {
         });
     }
 
-    findFileByKey(key, folder){
-        let result = null
-        for(var f in folder){
-            var item = folder[f]
-            if(item.children > 0){
-                result = this.findFileByKey(key, item.children) 
-            }else if(item.key === key){
-                result = item
+    promptInput(title, label, callback){
+        prompt({
+            title: title,
+            label: label,
+            value: '',
+            inputAttrs: {
+                type: 'text'
+            },
+            type: 'input'
+        })
+        .then((r) => {
+            if(r === null) {
+                console.log('user cancelled');
+            } else {
+                console.log('result', r);
+                callback(r)
             }
-        }
-        return result
+        })
+        .catch(console.error);
     }
 
+    createFile(){
+
+        this.promptInput("Please enter a file name", "Filename :", (filename) => {
+   
+            let selectedItem = this.state.contextSelection
+            this.fileManager.writeFile(filename, 'Text contents', selectedItem.path)
+            let file = {
+                name : filename,
+                type : 'file',
+                children : null,
+                path : selectedItem.path + '/' + filename,
+                saved : true,
+                key : this.fileManager.randomID()
+            }
+            if(this.state.folder.key === selectedItem.key){ //is root folder
+                this.state.folder.children.push(file)
+            }else{
+                this.state.folder.children = this.fileManager.addToFolder(this.state.folder.children, selectedItem.key, file)
+            } 
+            this.setState({
+                folder : this.state.folder
+            })
+        })
+
+    }
+
+    createFolder(){
+
+
+        this.promptInput("Please enter a folder name", "Folder :", (foldername) => {
+
+            let selectedItem = this.state.contextSelection
+            this.fileManager.writeFolder(foldername, selectedItem.path)
+    
+            let folder = {
+                name : foldername,
+                type : 'folder',
+                children : [],
+                path : selectedItem.path + '/' + foldername,
+                key : this.fileManager.randomID()
+            }
+    
+            if(this.state.folder.key === selectedItem.key){ //is root folder
+                this.state.folder.children.push(folder)
+            }else{
+                this.state.folder.children = this.fileManager.addToFolder(this.state.folder.children, selectedItem.key, folder)
+            } 
+    
+            this.setState({
+                folder : this.state.folder
+            })
+
+        })
+
+
+    }
+
+    //deletes files and folders
+    deleteFile(isFile){
+        let selectedItem = this.state.contextSelection
+        this.fileManager.delete(selectedItem.path)
+        this.state.folder.children = this.fileManager.removeFromFolder(this.state.folder.children, selectedItem.key)
+        this.setState({
+            folder : this.state.folder
+        })
+    }
+
+   
+
     onRightClick = (event) => {
+        //conext menu 
         let file = null
-        if(event.node.props.dataRef){ //is file
+        if(event.node.props.dataRef){ //is file  
+            //find file
             let fileKey = event.node.props.dataRef.key
-            file = this.findFileByKey(fileKey, this.state.folder.children)
+            file = this.fileManager.findFileByKey(fileKey, this.state.folder.children)
+            //show context menu
             this.refs.ContextMenu1.show();
         }else{
-            file = 'folder'
+            //find folder
+            let folderKey = event.node.props.eventKey
+            if(this.state.folder.key === folderKey){ //if is root folder
+                file = this.state.folder
+            }else{ // if child folder
+                file = this.fileManager.findFolderByKey(folderKey, this.state.folder.children)
+            }
+            //show context menu
             this.refs.ContextMenu2.show();
         }
-        console.log(file)
+        this.setState({
+            contextSelection : file
+        })
     }
 
     onSelect(item, e) {
-        console.log(e)
         if(!e.selectedNodes[0]){
             return
         }
@@ -285,19 +375,19 @@ class Editor extends Component {
 
     }
     
-   
+
     render() {
 
         const fileMenu = ([
             <div className="contextMenu--option" key={3}>Rename</div>,
-            <div className="contextMenu--option" key={4}>Delete</div>,
+            <div className="contextMenu--option" onClick={() => this.deleteFile(true)} key={4}>Delete</div>,
         ])
         const folderMenu = ([
-            <div className="contextMenu--option" key={0}>New File</div>,
-            <div className="contextMenu--option" key={1}>New Folder</div>,
+            <div className="contextMenu--option" onClick={() => this.createFile()} key={0}>New File</div>,
+            <div className="contextMenu--option" onClick={() => this.createFolder()} key={1}>New Folder</div>,
             <div className="contextMenu--separator" key={2}/>,
-            <div className="contextMenu--option" key={3}>Rename</div>,
-            <div className="contextMenu--option" key={4}>Delete</div>,
+            // <div className="contextMenu--option" key={3}>Rename</div>,
+            <div className="contextMenu--option" onClick={() => this.deleteFile(false)} key={4}>Delete</div>,
         ])
 
         return (
@@ -319,7 +409,7 @@ class Editor extends Component {
                         onRightClick={(e) => {this.onRightClick(e)}}
                     >
                 
-                        <TreeNode title={this.state.folder.name} key="0-0">
+                        <TreeNode title={this.state.folder.name} key={this.state.folder.key}>
                             { this.renderTreeNodes(this.state.folder.children) }
                         </TreeNode> 
 

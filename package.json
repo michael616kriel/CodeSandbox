@@ -9,6 +9,8 @@
     "axios": "^0.18.0",
     "codemirror": "^5.39.2",
     "electron-context-menu": "^0.10.0",
+    "electron-prompt": "^1.1.0",
+    "fs-extra": "^7.0.0",
     "react": "^16.4.1",
     "react-app-rewire-less": "^2.1.2",
     "react-app-rewired": "^1.5.2",

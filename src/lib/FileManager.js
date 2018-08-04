@@ -1,5 +1,5 @@
 const electron = window.require('electron');
-const fs = electron.remote.require('fs');
+const fs = electron.remote.require('fs-extra');
 
 export default class FileManager {
  
@@ -34,7 +34,8 @@ export default class FileManager {
             name : folder,
             type : 'folder',
             children : this.getFolders(path),
-            key : `id-${this.randomID()}`
+            key : `${this.randomID()}`,
+            path : path
         }
     }
 
@@ -74,6 +75,91 @@ export default class FileManager {
           }
         }
         return folder
+    }
+
+    delete(path){
+        try{
+            fs.removeSync(path.replace(/^\/|\/$/g, ''));
+        }catch (e){
+            console.log("Cannot delete ", e);
+        }
+    }
+
+    writeFile(name, content, path){
+        try{
+            fs.writeFileSync(`${path}/${name}`, content);
+        }catch (e){
+            console.log("Cannot write file ", e);
+        }
+    }
+
+    writeFolder(name, path){
+        try{
+            if (!fs.existsSync(`${path}/${name}`)){
+                fs.mkdirSync(`${path}/${name}`);
+            }
+        }catch (e){
+            console.log("Cannot write folder ", e);
+        }
+    }
+
+    //Files and Folders
+    findFileByKey(key, folder){
+        let result = null
+        for(var f in folder){
+            var item = folder[f]
+            if(item.children){
+                result = this.findFileByKey(key, item.children) 
+            }else if(item.key === key){
+                result = item
+                return result
+            }
+        }
+        return result
+    }
+
+    findFolderByKey(key, folder){
+        let result = null
+        for(var f in folder){
+            var item = folder[f]
+            var hasChildren = (item.children) ? (item.children.length > 0) : false
+            if(hasChildren && item.key !== key){
+                result = this.findFolderByKey(key, item.children) 
+                if(result){
+                    return result
+                }
+            }else if(item.key === key){
+                result = item
+                return result
+            }
+        }
+    }
+
+    removeFromFolder(items, key){
+        for(var f in  items){
+            var item = items[f]
+            if(item.children && item.key !== key){
+                item.children = this.removeFromFolder(item.children, key) 
+            }else if(item.key === key){
+                items.splice(f, 1)
+                return items
+            }
+        }
+        return items
+    }
+
+    addToFolder(root, key, itemToAdd){
+        let items = root
+        for(var f in  items){
+            var item = items[f]
+            if(item.children && item.key !== key){
+                item.children = this.addToFolder(item.children, key, itemToAdd) 
+            }else if(item.key === key){
+                item.children.push(itemToAdd)
+                return root
+            }
+        }
+        return root
     }
 
 
