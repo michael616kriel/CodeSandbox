@@ -2,19 +2,43 @@
 
 import React, { Component } from 'react';
 import { Icon, Button, Layout, Tree  } from 'antd';
-import { UnControlled as CodeMirror} from 'react-codemirror2'
+import { UnControlled as CodeMirrorEditor} from 'react-codemirror2'
 import { Tabs } from 'antd';
-
 import ContextMenu from '../../components/ContextMenu'
-
+import * as CodeMirror from 'codemirror'
 
 import FileManager from '../../lib/FileManager'
 import './Editor.css';
 
-require('codemirror/mode/xml/xml');
-require('codemirror/mode/javascript/javascript');
-require('codemirror/mode/css/css');
+import "codemirror/lib/codemirror";
 
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/mode/css/css';
+import 'codemirror/mode/htmlmixed/htmlmixed';
+import 'codemirror/mode/xml/xml';
+
+import 'codemirror/addon/hint/javascript-hint';
+import 'codemirror/addon/hint/xml-hint';
+import 'codemirror/addon/hint/css-hint';
+import 'codemirror/addon/hint/html-hint';
+import 'codemirror/addon/hint/anyword-hint';
+
+import 'codemirror/addon/hint/show-hint'; 
+import 'codemirror/addon/hint/show-hint.css'; 
+
+import "codemirror/addon/fold/foldcode.js"
+import "codemirror/addon/fold/foldgutter.js"
+import "codemirror/addon/fold/brace-fold.js"
+import "codemirror/addon/fold/indent-fold.js"
+import "codemirror/addon/fold/comment-fold.js"
+import "codemirror/addon/fold/xml-fold.js"
+
+import "codemirror/addon/dialog/dialog.js"
+import "codemirror/addon/scroll/annotatescrollbar.js"
+import "codemirror/addon/search/search.js"
+import "codemirror/addon/search/searchcursor.js"
+import "codemirror/addon/search/matchesonscrollbar.js"
+import "codemirror/addon/search/jump-to-line.js"
 
 const theme = require('./../../theme')
 const TabPane = Tabs.TabPane;
@@ -95,19 +119,29 @@ class Editor extends Component {
 
         let config = Object.assign({
             theme: 'material',
-            lineNumbers: true
+            lineNumbers: true,
+            styleActiveLine: true,
+            matchBrackets: true,
+            foldGutter: true,
+            autoRefresh:false,
+            lineWiseCopyCut : false,
+            globalVars : true,
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+            extraKeys: {
+                "Ctrl-Space": "autocomplete",
+                "Ctrl-Q" : function(cm){ cm.foldCode(cm.getCursor()) },
+                "Alt-F": "findPersistent"
+            }
         }, options[ext])
 
-        return (
-            <CodeMirror
+
+        let editorRender = (
+            <CodeMirrorEditor
                 className="customEditor"
                 style={{ height: '100%' }}
                 value={this.state.values[key]}
                 autoCursor={false}
                 options={config}
-                // onBeforeChange={(editor, data, value) => {
-                    
-                // }}
                 onChange={(editor, data, value) => {
                     let values = this.state.values
                     let panes = this.state.panes
@@ -117,13 +151,14 @@ class Editor extends Component {
                             values[key] = value
                         }
                     }
-
+                    //editor.execCommand('autocomplete')
                     this.setState({values : values, panes : panes})
                 }}
-            />
-        )
+                />
+            )
+
+        return  editorRender
     }
-    
 
     addEditor(file){
         
@@ -145,24 +180,6 @@ class Editor extends Component {
         })
     }
 
-
-    renderTreeNodes = (data) => {
-        if(!data){
-            return
-        }
-        return data.map((item) => {
-            if (item.type === 'folder') {
-            return (
-                <TreeNode title={item.name} key={item.key}>
-                    {this.renderTreeNodes(item.children)}
-                </TreeNode>
-            );
-            }
-            return (
-                <TreeNode title={item.name} key={item.key} dataRef={item} isLeaf/>
-            );
-        });
-    }
 
     promptInput(title, label, callback){
         prompt({
@@ -211,6 +228,38 @@ class Editor extends Component {
 
     }
 
+
+    renameFile(){
+
+        this.promptInput("Please enter a file name", "Rename :", (filename) => {
+   
+            let selectedItem = this.state.contextSelection
+            let newPath = this.fileManager.renameFile(selectedItem.path, selectedItem.name, filename)
+
+  
+            this.state.folder.children = this.fileManager.updateFileByKey(this.state.folder.children, selectedItem.key, { name : filename, path : newPath })
+
+           console.log(this.state.folder.children)
+
+
+            let panes = this.state.panes
+            for(var k in panes){
+                var pane = panes[k]
+                if(pane.key === selectedItem.key){
+                     pane.title = filename
+                     pane.path = newPath
+                }
+            }
+
+            this.setState({
+                folder : this.state.folder,
+                panes : panes
+            })
+            console.log('renamed file')
+        })
+
+    }
+
     createFolder(){
 
 
@@ -244,7 +293,11 @@ class Editor extends Component {
 
     //deletes files and folders
     deleteFile(isFile){
+        if(!window.confirm(`Are you sure you want to delete "${this.state.contextSelection.name}" ?`)){
+            return
+        }
         let selectedItem = this.state.contextSelection
+        this.remove(selectedItem.key)
         this.fileManager.delete(selectedItem.path)
         this.state.folder.children = this.fileManager.removeFromFolder(this.state.folder.children, selectedItem.key)
         this.setState({
@@ -252,7 +305,6 @@ class Editor extends Component {
         })
     }
 
-   
 
     onRightClick = (event) => {
         //conext menu 
@@ -374,12 +426,45 @@ class Editor extends Component {
         })
 
     }
+
+
+
+    sortFolder(folder){
+        folder.sort((a,b) => {
+            if (a.type < b.type)
+                return 1;
+            if (a.type > b.type)
+                return -1;
+            return 0;
+        })
+        return folder
+    }
+      
+
+    renderTreeNodes = (data) => {
+        if(!data || !(typeof data === 'object')){
+            return
+        }
+        return this.sortFolder(data).map((item) => {
+            if (item.type === 'folder') {
+            return (
+                <TreeNode title={item.name} key={item.key}>
+                    {this.renderTreeNodes(item.children)}
+                </TreeNode>
+            );
+            }
+            return (
+                <TreeNode title={item.name} key={item.key} dataRef={item} isLeaf/>
+            );
+        });
+    }
+
     
 
     render() {
 
         const fileMenu = ([
-            <div className="contextMenu--option" key={3}>Rename</div>,
+            <div className="contextMenu--option" onClick={() => { this.renameFile() }} key={3}>Rename</div>,
             <div className="contextMenu--option" onClick={() => this.deleteFile(true)} key={4}>Delete</div>,
         ])
         const folderMenu = ([

@@ -39,6 +39,12 @@ export default class FileManager {
         }
     }
 
+    renameFile(path, file, newName){
+        let renameFile = path.replace(file, newName)
+        fs.renameSync(path, renameFile);
+        return renameFile
+    }
+
     readFile(path){
         return fs.readFileSync(path, "utf8")
     }
@@ -160,6 +166,24 @@ export default class FileManager {
             }
         }
         return root
+    }
+
+
+    updateFileByKey(folder, key, value){
+        for(var f in folder){
+            var item = folder[f]
+            if(item.children){
+                item.children = this.updateFileByKey(item.children, key, value) 
+            }else if(item.key === key){
+                for(var k in value){ //update values
+                    if(item.hasOwnProperty(k)){
+                        item[k] = value[k]
+                    }
+                }
+                return folder
+            }
+        }
+        return folder
     }
 
 
