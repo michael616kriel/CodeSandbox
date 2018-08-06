@@ -1,7 +1,7 @@
 
 
 import React, { Component } from 'react';
-import { Icon, Button, Layout, Tree  } from 'antd';
+import { Icon, Button, Layout, Tree, message  } from 'antd';
 import { UnControlled as CodeMirrorEditor} from 'react-codemirror2'
 import { Tabs } from 'antd';
 import ContextMenu from '../../components/ContextMenu'
@@ -80,6 +80,8 @@ class Editor extends Component {
         this.setState({
             panes : panes,
         })
+
+        message.success('File Saved.');
     }
 
     componentDidMount() {
@@ -224,6 +226,9 @@ class Editor extends Component {
             this.setState({
                 folder : this.state.folder
             })
+
+            message.success('File Created.');
+
         })
 
     }
@@ -239,9 +244,6 @@ class Editor extends Component {
   
             this.state.folder.children = this.fileManager.updateFileByKey(this.state.folder.children, selectedItem.key, { name : filename, path : newPath })
 
-           console.log(this.state.folder.children)
-
-
             let panes = this.state.panes
             for(var k in panes){
                 var pane = panes[k]
@@ -255,7 +257,9 @@ class Editor extends Component {
                 folder : this.state.folder,
                 panes : panes
             })
-            console.log('renamed file')
+
+            message.success('File Renamed.');
+
         })
 
     }
@@ -286,6 +290,8 @@ class Editor extends Component {
                 folder : this.state.folder
             })
 
+            message.success('Folder Created.');
+
         })
 
 
@@ -297,12 +303,14 @@ class Editor extends Component {
             return
         }
         let selectedItem = this.state.contextSelection
+        let type = selectedItem.type
         this.remove(selectedItem.key)
         this.fileManager.delete(selectedItem.path)
         this.state.folder.children = this.fileManager.removeFromFolder(this.state.folder.children, selectedItem.key)
         this.setState({
             folder : this.state.folder
         })
+        message.success(`${(type === 'file') ? 'File' : 'Folder'} deleted.`);
     }
 
 

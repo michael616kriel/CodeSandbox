@@ -12,13 +12,13 @@ const url = require('url');
 let mainWindow;
 
 //add context menu
-// require('electron-context-menu')({
-//     prepend: (params, browserWindow) => [{
-//         label: 'Context Menu',
-//         // Only show it when right-clicking images
-//         visible: params.mediaType === 'image'
-//     }]
-// });
+require('electron-context-menu')({
+    prepend: (params, browserWindow) => [{
+        label: 'Context Menu',
+        // Only show it when right-clicking images
+        visible: params.mediaType === 'image'
+    }]
+});
 
 
 function createWindow() {

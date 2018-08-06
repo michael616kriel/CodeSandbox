@@ -5,6 +5,8 @@ import Shell from '../../lib/Shell'
 import NpmRegistry from '../../lib/NpmRegistry'
 import FileManager from '../../lib/FileManager'
 
+import BrowserView from '../../components/BrowserView'
+
 const theme = require('./../../theme')
 const Search = Input.Search;
 const { Meta } = Card;
@@ -16,15 +18,20 @@ const child_process = electron.remote.require( 'child_process' )
 
 class Projects extends Component {
 
+
     constructor(){
         super()
 
+        this.shell = new Shell()
         this.filesManager = new FileManager()
         let projects = this.filesManager.readProjects()
         
         this.state = {
+
+
             projects : projects,
             visible: false,
+            runDrawerVisible : false,
 
             ModalText: '',
             modalVisible: false,
@@ -67,12 +74,11 @@ class Projects extends Component {
     }
 
     serveProject(item){
-
-        const shell = new Shell('npm start', item.path.replace('//', '/').replace('/', '\\'))
-        shell.run({
+        this.showRunDrawer(true)
+        this.shell.run('npm start', item.path.replace('//', '/').replace('/', '\\'), {
             onMessage : (data) => {
                 console.log(data.toString())
-                child_process.execSync('start http://localhost:9000')
+               // child_process.execSync('start http://localhost:9000')
             },
             onError : (data) => {
                 console.log(data.toString())
@@ -93,8 +99,8 @@ class Projects extends Component {
             confirmLoading: true,
             ModalText : ''
         });
-        const shell = new Shell('npm i ', item.path)
-        shell.run({
+
+        this.shell.run('npm i ', item.path, {
             onMessage : (data) => {
                 this.setState({
                     ModalText: `${data} ${this.state.ModalText}`,
@@ -153,8 +159,7 @@ class Projects extends Component {
         });
 
         //run shell
-        const shell = new Shell(`npm i ${npmpackage.package.name} --save`, this.state.selectedProject.path)
-        shell.run({
+        this.shell.run(`npm i ${npmpackage.package.name} --save`, this.state.selectedProject.path, {
             onMessage : (data) => {
                 this.setState({
                     ModalText: `${data} ${this.state.ModalText}`,
@@ -373,6 +378,32 @@ class Projects extends Component {
         )
     }
 
+    showRunDrawer(show){
+        this.setState({
+            runDrawerVisible : show
+        })
+    }
+
+    runDrawer(){
+        return (
+            <Drawer
+                title="Browser"
+                placement="right"
+                closable={false}
+                onClose={() => { this.showRunDrawer(false) }}
+                visible={this.state.runDrawerVisible}
+                width={'70%'}
+                style={{
+                    height: 'calc(100% - 55px)',
+                    overflow: 'auto',
+                    padding: 0,
+                }}
+                >
+                <BrowserView />
+            </Drawer>
+        )
+    }
+
     drawerRender(){
         return (
             <Drawer
@@ -437,6 +468,7 @@ class Projects extends Component {
         return (
             <div className="Settings">
                 {this.drawerRender()}
+                {this.runDrawer()}
                 {this.modalLoggerRender()}
                 {this.modalNpmInstallRender()}
                 <Row gutter={16}>
