@@ -9,26 +9,27 @@ export default class Shell {
 
     run(command, path, callback){
 
-        // if(this.ls){
-        //     this.kill()
-        // } 
+        if(this.ls){
+            this.kill()
+        } 
 
-        // let commands = command.split(' ')
-        // let mainCommand = commands[0].replace('npm', 'npm.cmd')
-        // commands.splice(0, 1)
+        let commands = command.split(' ')
+        let mainCommand = commands[0].replace('npm', 'npm.cmd')
+        commands.splice(0, 1)
 
-        // this.ls = spawn(mainCommand, commands, { cwd: path } );
-        // this.ls.stdout.on('data', data => {
-        //     callback.onMessage(data)
-        // })
+        this.ls = spawn(mainCommand, commands, { cwd: path } );
 
-        // this.ls.stderr.on('data', data => {
-        //     callback.onError(data)
-        // })
+        this.ls.stdout.on('data', data => {
+            callback.onMessage(data)
+        })
 
-        // this.ls.on('close', code => {
-        //     callback.close(code)
-        // })
+        this.ls.stderr.on('data', data => {
+            callback.onError(data)
+        })
+
+        this.ls.on('close', code => {
+            callback.close(code)
+        })
 
     }
 

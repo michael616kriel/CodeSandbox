@@ -7,8 +7,8 @@
 
 
 var pallet = {
-    primary : '#33536a',
-    secondary : '#517F85',
+    primary : '#0070b5',
+    secondary : '#0070b5',
     red : '#f20c45',
     green : '#579c87',
     yellow : '#eedd67',

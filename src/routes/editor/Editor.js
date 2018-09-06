@@ -489,10 +489,10 @@ class Editor extends Component {
                 <ContextMenu ref="ContextMenu1" id="ContextMenu1" children={ fileMenu }/>
                 <ContextMenu ref="ContextMenu2" id="ContextMenu2" children={ folderMenu }/>
 
-                 <Layout style={{ padding: '0', background: '#fff' }}>
+                 <Layout style={{ padding: '0', background: '#fff', marginTop : 16, marginLeft : 16 }}>
                     <Sider width={250} style={{ background: '#fff' }}>
 
-                    <Button style={{ margin : 10 }} onClick={() => { this.saveFile() }}>Save File</Button>
+                    {/* <Button style={{ margin : 10 }} onClick={() => { this.saveFile() }}>Save File</Button> */}
                     
                     <DirectoryTree
                         defaultExpandAll
@@ -511,7 +511,7 @@ class Editor extends Component {
                     <Content style={{ 
                         padding: '0px', 
                         minHeight: 680,
-                        height: '680px'
+                        // height: '680px'
                         }}>
                         {this.editorRender()}
                     </Content>

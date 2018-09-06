@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Icon, Col, Row, Drawer, List, Collapse, Modal, Button, Input, Divider, message } from 'antd';
+import { Card, Icon, Col, Row, Drawer, List, Collapse, Modal, Button, Input, Divider, message, Tooltip } from 'antd';
 import './Projects.css';
 import Shell from '../../lib/Shell'
 import NpmRegistry from '../../lib/NpmRegistry'
@@ -28,11 +28,9 @@ class Projects extends Component {
         
         this.state = {
 
-
             projects : projects,
             visible: false,
             runDrawerVisible : false,
-
             ModalText: '',
             modalVisible: false,
 
@@ -73,21 +71,21 @@ class Projects extends Component {
         this.props.history.push(`/editor/${item.folder}`)
     }
 
-    serveProject(item){
-        this.showRunDrawer(true)
-        this.shell.run('npm start', item.path.replace('//', '/').replace('/', '\\'), {
-            onMessage : (data) => {
-                console.log(data.toString())
-               // child_process.execSync('start http://localhost:9000')
-            },
-            onError : (data) => {
-                console.log(data.toString())
-            },
-            close : (data) => {
-                console.log(data.toString())
-            }
-        })
-    }
+    // serveProject(item){
+    //     this.showRunDrawer(true)
+    //     this.shell.run('npm start', item.path.replace('//', '/').replace('/', '\\'), {
+    //         onMessage : (data) => {
+    //             console.log(data.toString())
+    //            // child_process.execSync('start http://localhost:9000')
+    //         },
+    //         onError : (data) => {
+    //             console.log(data.toString())
+    //         },
+    //         close : (data) => {
+    //             console.log(data.toString())
+    //         }
+    //     })
+    // }
 
     // npm install
     runNpmInstall(item){
@@ -132,8 +130,6 @@ class Projects extends Component {
         });
     }
 
-
-
     checkPackageInstalled(dependency){
         let project = this.state.selectedProject.package
         for(var name in project.dependencies){
@@ -147,8 +143,17 @@ class Projects extends Component {
         return false
     }
     
-    npmInstallPackage(npmpackage){
-        if(!window.confirm(`Are you sure you want to install "${npmpackage.package.name}" ?`)){
+    npmInstallPackage(npmpackage, uninstall=false){
+
+
+        let command = `npm ${(uninstall) ? 'uninstall' : 'install'}`;
+        let packageName = (uninstall) ? npmpackage.name : npmpackage.package.name
+
+        command += ` ${packageName} ${(uninstall) ? '' : '--save'}`
+
+        console.log(command)
+
+        if(!window.confirm(`Are you sure you want to ${(uninstall) ? 'uninstall' : 'install'} "${packageName}" ?`)){
             return
         }
 
@@ -158,8 +163,9 @@ class Projects extends Component {
             ModalText : ''
         });
 
+    
         //run shell
-        this.shell.run(`npm i ${npmpackage.package.name} --save`, this.state.selectedProject.path, {
+        this.shell.run(`${command}`, this.state.selectedProject.path, {
             onMessage : (data) => {
                 this.setState({
                     ModalText: `${data} ${this.state.ModalText}`,
@@ -178,6 +184,34 @@ class Projects extends Component {
             }
         })
 
+    }
+
+
+    runCommand(command){
+        console.log(command)
+        this.setState({
+            modalVisible: true,
+            confirmLoading: true,
+            ModalText : ''
+        });
+        this.shell.run(`${command}`, this.state.selectedProject.path, {
+            onMessage : (data) => {
+                this.setState({
+                    ModalText: `${data} ${this.state.ModalText}`,
+                });
+            },
+            onError : (data) => {
+                this.setState({
+                    ModalText: `${data} ${this.state.ModalText}`,
+                });
+            },
+            close : (data) => {
+                this.setState({
+                    projects : this.filesManager.reloadProject(this.state.projects, this.state.selectedProject),
+                    confirmLoading: false,
+                });
+            }
+        })
     }
 
     onSearch = (value) =>{
@@ -326,15 +360,15 @@ class Projects extends Component {
                         itemLayout="horizontal"
                         dataSource={this.mapDependencies(dependencies)}
                         renderItem={item => (
-                        <List.Item actions={[<Button type="danger">Unistall</Button>]}>
-                            
-                    
-                            <List.Item.Meta
-                            // avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                            title={item.name}
-                            description={item.version}
-                            />
-                        </List.Item>
+                            <List.Item actions={[<Button onClick={ () => { this.npmInstallPackage(item, true) } } type="danger">uninstall</Button>]}>
+                                
+                        
+                                <List.Item.Meta
+                                // avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
+                                title={item.name}
+                                description={item.version}
+                                />
+                            </List.Item>
                         )}
                     />
                 </Panel>
@@ -344,15 +378,15 @@ class Projects extends Component {
                         itemLayout="horizontal"
                         dataSource={this.mapDependencies(devDependencies)}
                         renderItem={item => (
-                        <List.Item actions={[<Button type="danger">Unistall</Button>]}>
+                            <List.Item actions={[<Button type="danger">uninstall</Button>]}>
 
-                    
-                            <List.Item.Meta
-                            // avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                            title={<a href="https://ant.design">{item.name}</a>}
-                            description={item.version}
-                            />
-                        </List.Item>
+                        
+                                <List.Item.Meta
+                                // avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
+                                title={<a href="https://ant.design">{item.name}</a>}
+                                description={item.version}
+                                />
+                            </List.Item>
                         )}
                     />
                 </Panel>
@@ -362,15 +396,15 @@ class Projects extends Component {
                         itemLayout="horizontal"
                         dataSource={this.mapDependencies(scripts)}
                         renderItem={item => (
-                        <List.Item actions={[<Button type="dashed">Run</Button>]}>
+                            <List.Item actions={[<Button onClick={() => { this.runCommand(item.version) }} type="dashed">Run</Button>]}>
 
-                    
-                            <List.Item.Meta
-                            // avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
-                            title={<a href="https://ant.design">{item.name}</a>}
-                            description={item.version}
-                            />
-                        </List.Item>
+                                {/* Version here is the actual command naming is wrong */}
+                                <List.Item.Meta
+                                // avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
+                                title={<a href="https://ant.design">{item.name}</a>}
+                                description={item.version}
+                                />
+                            </List.Item>
                         )}
                     />
                 </Panel>
@@ -443,14 +477,22 @@ class Projects extends Component {
                     style={{ width: '100%', margin : '0 0 16px 0' }}
                     // cover={<img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />}
                     actions={[
-                        <Icon type="eye" onClick={(event) => { 
-                            this.showDrawer();
-                            this.setState({ selectedProject : item })
-                        }}/>, 
-                        <Icon type="edit" onClick={(event) => { this.edit(item, i) }}/>, 
-                        <Icon type="delete" onClick={(event) => { this.delete(item, i) }}/>, 
-                        <Icon type="rocket" onClick={(event) => { this.runNpmInstall(item) }}/>,
-                        <Icon type="laptop" onClick={(event) => { this.serveProject(item) }}/>
+                        <Tooltip placement="top" title={'View'}>
+                            <Icon type="eye" onClick={(event) => { 
+                                this.showDrawer();
+                                this.setState({ selectedProject : item })
+                            }}/>
+                        </Tooltip>,
+                        <Tooltip placement="top" title={'Edit'}>
+                            <Icon type="edit" onClick={(event) => { this.edit(item, i) }}/>
+                        </Tooltip>,
+                        <Tooltip placement="top" title={'Delete'}> 
+                            <Icon type="delete" onClick={(event) => { this.delete(item, i) }}/>
+                        </Tooltip>, 
+                        <Tooltip placement="top" title={'Install'}>
+                            <Icon type="rocket" onClick={(event) => { this.runNpmInstall(item) }}/>
+                        </Tooltip>,
+                        // <Icon type="laptop" onClick={(event) => { this.serveProject(item) }}/>
                     ]}
                 >
                     <Meta
@@ -471,7 +513,7 @@ class Projects extends Component {
                 {this.runDrawer()}
                 {this.modalLoggerRender()}
                 {this.modalNpmInstallRender()}
-                <Row gutter={16}>
+                <Row gutter={16} style={{ 'margin' : 16 }}>
                     {allProjects}
                 </Row>
             </div>

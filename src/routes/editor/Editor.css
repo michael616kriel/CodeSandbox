@@ -60,3 +60,16 @@
 .editor-tabs.ant-tabs.ant-tabs-card > .ant-tabs-bar .ant-tabs-tab-active {
     color: #fff;
 }
+
+
+.Editor .ant-layout.ant-layout-has-sider {
+    height: 92vh;
+}
+
+.Editor .ant-layout-content {
+    height: 92vh;
+}
+
+.Editor .ant-tabs-extra-content {
+    display: none;
+}

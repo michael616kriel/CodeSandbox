@@ -31,7 +31,9 @@ class App extends Component {
           collapsible
           collapsed={this.state.collapsed}
         >
-          <div className="logo" />
+          <div className="logo">
+            <img src="assets/Logo.png"/> <span>Nova</span>
+          </div>
           <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
             <Menu.Item key="1">
               <Link to='/'>
@@ -52,10 +54,10 @@ class App extends Component {
             />
           </Header>
           <Content style={{ 
-            margin: '16px', 
+            // margin: '16px', 
             padding: 0, 
             background: 'transparent', 
-            minHeight: 280 
+            // minHeight: 280 
             }}>
               <Switch>
                 <Route exact path='/' component={Projects}/>

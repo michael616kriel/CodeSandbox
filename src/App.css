@@ -43,7 +43,48 @@
 }
 
 #root .logo {
-  height: 32px;
-  background: rgba(255,255,255,.2);
-  margin: 16px;
+  height: 60px;
+  position: relative;
+}
+
+#root .logo img {
+  position: relative;
+  height: inherit;
+  color: #fff;
+  position: absolute;
+  height: 40px;
+  width: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 5px;
+  transition: 0.5s ease-in-out all;
+}
+
+#root .logo span {
+  color: #0070b5;
+  font-size: 24px;
+  display: inline-block;
+  margin-top: 0px;
+  position: absolute;
+  top: 12px;
+  left: 50px;
+  transition: 0.6s ease-in-out all;
+}
+
+
+.ant-menu.ant-menu-dark .ant-menu-item-selected, .ant-menu-submenu-popup.ant-menu-dark .ant-menu-item-selected {
+  background: #0070b5;
+}
+
+.ant-tree.ant-tree-directory > li.ant-tree-treenode-selected > span.ant-tree-node-content-wrapper:before, .ant-tree.ant-tree-directory .ant-tree-child-tree > li.ant-tree-treenode-selected > span.ant-tree-node-content-wrapper:before {
+  background: #0070b5 !important;
+}
+
+.ant-layout-sider-collapsed .logo img {
+  left: 50% !important;
+  transform: translate3D(-50%, -50%, 0) !important;
+}
+
+.ant-layout-sider-collapsed .logo span {
+  opacity: 0;
 }
