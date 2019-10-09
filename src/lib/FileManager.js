@@ -1,5 +1,6 @@
 const electron = window.require('electron');
 const fs = electron.remote.require('fs-extra');
+const pathModule = electron.remote.require('path');
 
 export default class FileManager {
  
@@ -58,9 +59,10 @@ export default class FileManager {
         let folders = fs.readdirSync(path)
         for(var f in folders){
           var item = folders[f]
-          var url = path + '/' + item + '/'
+          var url = pathModule.join(path, item)
           if(item !== 'node_modules'){
-            if(fs.lstatSync(url).isDirectory()){
+            const isDir = fs.statSync(url).isDirectory()
+            if(isDir){
                 folder.push({
                     name : item,
                     type : 'folder',
